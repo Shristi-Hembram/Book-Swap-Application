@@ -1,0 +1,51 @@
+{% extends 'bookswap/base.html' %}
+
+{% block title %}Reviews for {{ book.title }}{% endblock %}
+
+{% block content %}
+    <h1>Reviews for "{{ book.title }}"</h1>
+
+    <!-- Book Information -->
+    <div>
+        <p><strong>Author:</strong> {{ book.author }}</p>
+        <p><strong>Description:</strong> {{ book.description }}</p>
+    </div>
+
+    <!-- List of Reviews -->
+    <h2>All Reviews</h2>
+    {% if book.reviews.all %}
+        <ul>
+            {% for review in book.reviews.all %}
+                <li>
+                    <strong>{{ review.user.username }}</strong> (Rated: {{ review.rating }}/5)<br>
+                    <em>{{ review.created_at|date:"M d, Y" }}</em><br>
+                    Comment: {{ review.comment }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No reviews yet for this book.</p>
+    {% endif %}
+
+    <!-- Add a Review Section -->
+    <h2>Add Your Review</h2>
+    {% if user.is_authenticated %}
+        <!-- Check if the user has already reviewed this book -->
+        {% if not user.reviews.filter(book=book).exists %}
+            <form method="POST">
+                {% csrf_token %}
+                <label for="rating">Rating (0-5):</label><br>
+                <input type="number" id="rating" name="rating" min="0" max="5" required><br>
+
+                <label for="comment">Comment:</label><br>
+                <textarea id="comment" name="comment" required></textarea><br>
+
+                <button type="submit">Submit Review</button>
+            </form>
+        {% else %}
+            <p>You have already reviewed this book.</p>
+        {% endif %}
+    {% else %}
+        <p><a href="{% url 'login' %}">Login</a> to add a review.</p>
+    {% endif %}
+{% endblock %}

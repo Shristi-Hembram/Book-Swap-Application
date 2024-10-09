@@ -1,0 +1,20 @@
+{% extends 'bookswap/base.html' %}
+
+{% block title %}My Swap Requests{% endblock %}
+
+{% block content %}
+    <h2>My Swap Requests</h2>
+
+    <ul>
+        {% if user_swap_requests %}
+            {% for request in user_swap_requests %}
+                <li>
+                    <p>You requested to swap <strong>{{ request.book_requested.title }}</strong> for <strong>{{ request.book_offered.title }}</strong>.</p>
+                    <p>Status: {{ request.status }}</p>
+                </li>
+            {% endfor %}
+        {% else %}
+            <p>You have not made any swap requests yet.</p>
+        {% endif %}
+    </ul>
+{% endblock %}

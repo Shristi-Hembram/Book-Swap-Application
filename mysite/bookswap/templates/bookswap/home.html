@@ -1,0 +1,47 @@
+{% extends 'bookswap/base.html' %}
+{% block title %}Home{% endblock %}
+{% block content %}
+    {% if user.is_authenticated %}
+        <h1>Welcome to the Book Swap Community, {{ user.username }}!</h1>
+        <p>Want to offer a book? <a href="{% url 'add_book' %}" class="btn btn-primary">Add Book</a> </p>
+        <p>Check your book requests <a href="{% url 'view_swap_requests' %}"> here </a></p>
+        <p>Check your sent requests <a href="{% url 'my_swap_request' %}">Here </a></p>
+        
+        <h2>My Books</h2>
+        <ul>
+            {% if user_books %}
+                {% for book in user_books %}
+                    <li>
+                        <strong>{{ book.title }}</strong> by {{ book.author }}
+                        <p>{{ book.description }}</p>
+                        <p>Status: {% if book.is_available %}Available{% else %}Not Available{% endif %}</p>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <p>You have not listed any books for swapping.</p>
+            {% endif %}
+        </ul>
+
+    {% else %}
+        <h1>Welcome to the Book Swap Community!</h1>
+        <p>Please <a href="{% url 'login' %}">login</a> to add a book and manage your account.</p>
+    {% endif %}
+
+    
+    <h2>Available Books for Swapping</h2>
+    <ul>
+        {% if available_books %}
+            {% for book in available_books %}
+                <li>
+                    <strong><a>{{ book.title }}</a></strong> by {{ book.author }} 
+                    <p>{{ book.description }}</p>
+                    <p>Owner: {{ book.owner.username }}</p>
+                    <p><a href="{% url 'book_detail' book.id %}">View Details</a></p>
+                </li>
+            {% endfor %}
+        {% else %}
+            <p>No books available for swapping at the moment.</p>
+        {% endif %}
+    </ul>
+
+{% endblock %}
