@@ -44,4 +44,29 @@
         {% endif %}
     </ul>
 
+    {% if recommended_books %}
+        <div class="mt-4">
+            <h3>Recommended Books for You</h3>
+            <div class="row">
+                {% for book in recommended_books %}
+                    <!-- <div class="col-md-4">
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ book.title }}</h5>
+                                <p class="card-text">by {{ book.author }}</p>
+                                <a href="{% url 'book_detail' book.id %}">View Details</a>
+                            </div>
+                        </div>
+                    </div> -->
+                    <li>
+                        <strong> {{book.title}} </strong> by {{book.author}}
+                        <p><a href="{%url 'book_detail' book.id%}"> View Details </a></p>
+                    </li>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <p>No recommendations available yet. Start reviewing books to get recommendations!</p>
+    {% endif %}
+
 {% endblock %}

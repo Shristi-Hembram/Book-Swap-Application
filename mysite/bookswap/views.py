@@ -3,20 +3,22 @@ from django.contrib.auth import login,authenticate, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from .models import Book, Review, SwapRequest
-
+from django.db.models import Count,Avg
 
 # Create your views here.
 def home(request):
-    available_books = Book.objects.filter(is_available=True)
-
     if request.user.is_authenticated:
-        available_books = available_books.exclude(owner=request.user)
-        user_books = Book.objects.filter(owner = request.user)
+        recommended_books = get_book_recommendations(request.user)
     else:
-        user_books=None
+        recommended_books = []
+    
+    available_books = Book.objects.filter(is_available=True).exclude(owner = request.user)
+    user_books = Book.objects.filter(owner = request.user)
+  
     context = {
         'available_books':available_books,
         'user_books':user_books,
+        'recommended_books':recommended_books,
     }
     return render(request,"bookswap/home.html",context)
 
@@ -113,4 +115,11 @@ def my_swap_request(request):
     }
     return render(request,'bookswap/mySwapRequests.html',context)
 
-
+def get_book_recommendations(user):
+    user_reviews = Review.objects.filter(user=user).select_related('book')
+    if user_reviews.exists():
+        reviewed_authors = user_reviews.values_list('book__author', flat=True).distinct()
+        recommended_books = Book.objects.filter(author__in=reviewed_authors).exclude(reviews__user=user).distinct()
+    else:
+        recommended_books = Book.objects.annotate(avg_rating=Avg('reviews__rating')).order_by('-avg_rating')[:5]
+    return recommended_books
